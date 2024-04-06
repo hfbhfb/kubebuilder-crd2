@@ -1,3 +1,22 @@
+
+## 运行 
+cd cmd
+gowatch
+
+## 编译 crd
+make manifests
+
+## 安装 crd
+make install
+
+## 编译docker和部署在集群里，参考 marka-dd-code-k8s-id575sjso
+
+
+
+
+---
+
+
 # crd2
 // TODO(user): Add simple overview of use/purpose
 

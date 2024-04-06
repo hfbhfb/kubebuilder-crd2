@@ -18,8 +18,8 @@ package controller
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/hfbhfb/kubebuilder-crd2/internal/tools/mytrace"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -51,7 +51,7 @@ type FooReconciler struct {
 func (r *FooReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	fmt.Println("here 111")
+	mytrace.Trace()
 	ins := v1alpha1.Foo{}
 	if err := r.Get(ctx, req.NamespacedName, &ins); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
