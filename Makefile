@@ -177,3 +177,10 @@ $(CONTROLLER_GEN): $(LOCALBIN)
 envtest: $(ENVTEST) ## Download envtest-setup locally if necessary.
 $(ENVTEST): $(LOCALBIN)
 	test -s $(LOCALBIN)/setup-envtest || GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
+
+
+samples:
+	-kubectl delete -f config/samples/app1_v1alpha1_foo.yaml 
+	-kubectl delete -f config/samples/app1_v1alpha1_foo2.yaml
+	kubectl apply -f config/samples/app1_v1alpha1_foo.yaml 
+	kubectl apply -f config/samples/app1_v1alpha1_foo2.yaml

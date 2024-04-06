@@ -18,15 +18,23 @@ package controller
 
 import (
 	"context"
+	"fmt"
+	"time"
 
-	"github.com/hfbhfb/kubebuilder-crd2/internal/tools/mytrace"
+	// "github.com/hfbhfb/kubebuilder-crd2/internal/tools/mytrace"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	"github.com/hfbhfb/kubebuilder-crd2/api/v1alpha1"
 	app1v1alpha1 "github.com/hfbhfb/kubebuilder-crd2/api/v1alpha1"
+)
+
+var (
+	debug1    bool = false
+	finalizer      = "foo-finalizer"
 )
 
 // FooReconciler reconciles a Foo object
@@ -49,19 +57,44 @@ type FooReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.16.2/pkg/reconcile
 func (r *FooReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx)
 
-	mytrace.Trace()
-	ins := v1alpha1.Foo{}
-	if err := r.Get(ctx, req.NamespacedName, &ins); err != nil {
+	// TODO(user): your logic here
+
+	// mytrace.Trace()
+	instance := v1alpha1.Foo{}
+	if err := r.Get(ctx, req.NamespacedName, &instance); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if ins.Status.State == v1alpha1.StatePending {
-		ins.Status.State = v1alpha1.StateReady
-		r.Status().Update(ctx, &ins)
+	fmt.Println("11mm")
+	if instance.ObjectMeta.DeletionTimestamp.IsZero() {
+		if instance.Status.State == v1alpha1.INIT_STATE {
+			instance.Status.State = v1alpha1.PENDING_STATE
+			r.Status().Update(ctx, &instance)
+		}
+
+		// 增加删除时候的处理
+		if controllerutil.AddFinalizer(&instance, finalizer) {
+			if err := r.Update(ctx, &instance); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+
+	} else {
+		// 等几秒钟后，再删除
+		time.Sleep(time.Second * 9)
+		controllerutil.RemoveFinalizer(&instance, finalizer)
+		if err := r.Update(ctx, &instance); err != nil {
+			return ctrl.Result{}, err
+		}
+		// log.Info("deal finalizer stream: ", finalizer)
 	}
-	// TODO(user): your logic here
+
+	if debug1 {
+		fmt.Println("111121aa")
+		log.Info("deal delete stream")
+	}
 
 	return ctrl.Result{}, nil
 }

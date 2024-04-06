@@ -22,8 +22,9 @@ import (
 
 // 定义一个常量组作为“枚举”
 const (
-	StatePending = iota
-	StateReady
+	INIT_STATE    = ""
+	PENDING_STATE = "pending"
+	READY_STATE   = "ready"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -42,7 +43,7 @@ type FooSpec struct {
 type FooStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	State int `json:"status,omitempty"`
+	State string `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
